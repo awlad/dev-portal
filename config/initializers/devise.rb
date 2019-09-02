@@ -298,7 +298,7 @@ Devise.setup do |config|
   # config.sign_in_after_change_password = true
   # JWT config
   config.jwt do |jwt|
-    jwt.secret = ENV['DEVISE_SECRET_KEY'] || Rails.application.credentials.secret_key_base
+    jwt.secret = ENV['DEVISE_SECRET_KEY'] || Rails.application.credentials.secret_key_base || Rails.application.secrets.secret_key_base
     jwt.dispatch_requests = [
         ['POST', %r{^/signup$}]
     ]

@@ -5,7 +5,6 @@ module Api
       before_action :set_skill, only: [:destroy]
 
       def index
-
         if params[:s]
           @skills = Skill.where('name like ?', "%#{params[:s]}%")
         else
@@ -20,24 +19,32 @@ module Api
         if !@skill
           @skill = Skill.create skill_attributes
         end
-        current_user.skills < @skill
 
-        render current_user.skills
+        if current_user.skills.where(id: @skill.id).any?
+          return render json: {error: 'Skill already exists!'}, status: 400
+        end
+
+        current_user.skills << @skill
+
+        render json: current_user.skills
       end
 
       def destroy
-
+        if !current_user.skills.where(id: @skill.id).any?
+          return render json: {error: 'Skill not exists!'}, status: 400
+        end
+        current_user.skills.delete(@skill)
       end
-    end
 
+      private
 
+      def set_skill
+        @skill = Skill.find(params[:id])
+      end
 
-    def set_skill
-      @skill = Skill.find(params[:id])
-    end
-
-    def skill_attributes
-      params.require(:skills).permit(:name, :description)
+      def skill_attributes
+        params.require(:skills).permit(:name, :description)
+      end
     end
   end
 end
